@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="memoizrlabs.com.shank2android">
+    <application>
+        <provider
+                android:authorities="shank"
+                android:name="life.shank.android.ShankContentProvider"
+        />
+    </application>
+</manifest>
