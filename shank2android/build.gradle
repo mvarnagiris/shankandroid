@@ -2,7 +2,15 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.memoizr.shankandroid'
+group='xxx'
+version = '2.0'
+
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
 
 android {
     compileSdkVersion 28
@@ -28,7 +36,8 @@ android {
 }
 
 dependencies {
-    api 'com.github.memoizr:shank:6b55d92'
+    api 'com.github.memoizr.shank:Shank:2.0.5'
+    api 'com.github.memoizr.shank:autoattach-pure:2.0.5'
 
     implementation 'androidx.appcompat:appcompat:1.0.2'
 }

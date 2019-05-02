@@ -1,19 +1,20 @@
-package memoizrlabs.com.shankandroid.autoattachandroid
+package life.shank.android
 
 import android.view.View
 import life.shank.*
-import life.shank.android.AutoScoped
 import life.shank.android.Helper.scopee
-import memoizrlabs.com.shankandroid.autoattachkotlin.AutoDetachable
-import memoizrlabs.com.shankandroid.autoattachkotlin.DetachAware
 import java.util.*
 
 fun <V : AutoDetachable, T : DetachAware<V>> ScopedProvider<T>.detachAware() = Detach0(this)
 fun <A, V : AutoDetachable, T : DetachAware<V>> ScopedProvider1<A, T>.detachAware() = Detach1(this)
-fun <A, B, V : AutoDetachable, T : DetachAware<V>> ScopedProvider2<A, B, T>.detachAware() = Detach2(this)
-fun <A, B, C, V : AutoDetachable, T : DetachAware<V>> ScopedProvider3<A, B, C, T>.detachAware() = Detach3(this)
-fun <A, B, C, D, V : AutoDetachable, T : DetachAware<V>> ScopedProvider4<A, B, C, D, T>.detachAware() = Detach4(this)
-fun <A, B, C, D, E, V : AutoDetachable, T : DetachAware<V>> ScopedProvider5<A, B, C, D, E, T>.detachAware() = Detach5(this)
+fun <A, B, V : AutoDetachable, T : DetachAware<V>> ScopedProvider2<A, B, T>.detachAware() =
+    Detach2(this)
+fun <A, B, C, V : AutoDetachable, T : DetachAware<V>> ScopedProvider3<A, B, C, T>.detachAware() =
+    Detach3(this)
+fun <A, B, C, D, V : AutoDetachable, T : DetachAware<V>> ScopedProvider4<A, B, C, D, T>.detachAware() =
+    Detach4(this)
+fun <A, B, C, D, E, V : AutoDetachable, T : DetachAware<V>> ScopedProvider5<A, B, C, D, E, T>.detachAware() =
+    Detach5(this)
 
 class Detach0<V : AutoDetachable, T : DetachAware<V>>(val p: ScopedProvider<T>) : IDetatch<V, T>() {
     inline fun bind(s: Scope, v: V) = p.invoke(s).registerAutoDetacheable(v)
@@ -42,8 +43,8 @@ class Detach5<A, B, C, D, E, V : AutoDetachable, T : DetachAware<V>>(val p: Scop
         p.invoke(s, a, b, c, d, e).registerAutoDetacheable(v)
 }
 
-abstract class IDetatch<V : AutoDetachable, T : DetachAware<V>> : Provider<T, Function<T>> {
-    protected val listeners = IdentityHashMap<View, O<V,T>>()
+abstract class IDetatch<V, T : DetachAware<V>> : Provider<T, Function<T>> where  V : AutoDetachable {
+    protected val listeners = IdentityHashMap<View, O<V, T>>()
     protected val action = { listeners.clear() }
 
     class O<V : AutoDetachable, T : DetachAware<V>>(var it: T) : View.OnAttachStateChangeListener {
@@ -53,6 +54,7 @@ abstract class IDetatch<V : AutoDetachable, T : DetachAware<V>> : Provider<T, Fu
 
     protected inline fun T.registerAutoDetacheable(v: V): T = also { detachAware ->
         (v as View)
+        (v as Scoped)
         listeners[v]
             ?.apply { this.it = detachAware }
             ?: O(detachAware).also {

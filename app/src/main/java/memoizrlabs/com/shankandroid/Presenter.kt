@@ -1,7 +1,7 @@
 package memoizrlabs.com.shankandroid
 
-import memoizrlabs.com.shankandroid.autoattachkotlin.AutoDetachable
-import memoizrlabs.com.shankandroid.autoattachkotlin.DetachAware
+import life.shank.AutoDetachable
+import life.shank.DetachAware
 
 abstract class Presenter<V : Presenter.View> {
     abstract fun onAttach(v: V)
