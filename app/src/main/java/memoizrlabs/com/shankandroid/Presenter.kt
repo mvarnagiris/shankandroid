@@ -1,7 +1,7 @@
 package memoizrlabs.com.shankandroid
 
-import life.shank.AutoDetachable
-import life.shank.DetachAware
+import life.shank.AttachListener
+import life.shank.Attachable
 
 abstract class Presenter<V : Presenter.View> {
     abstract fun onAttach(v: V)
@@ -10,14 +10,14 @@ abstract class Presenter<V : Presenter.View> {
     interface View
 }
 
-abstract class PresenterAdapter<V>: Presenter<V>(), DetachAware<V> where V: AutoDetachable, V: Presenter.View {
-    override fun attach(v: V) {
+abstract class PresenterAdapter<V>: Presenter<V>(), AttachListener<V> where V: Attachable, V: Presenter.View {
+    override fun onAttach(v: V) {
         onAttach(v)
     }
 
-    override fun detach(v: V) {
+    override fun onDetach(v: V) {
         onDetach(v)
     }
 
-    interface View : Presenter.View, AutoDetachable
+    interface View : Presenter.View, Attachable
 }

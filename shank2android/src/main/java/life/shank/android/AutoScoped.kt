@@ -8,13 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import life.shank.Scope
 import life.shank.Scoped
-import life.shank.android.Helper.scopee
+import life.shank.android.Helper.getCachedScope
 import life.shank.android.ShankActivityLifecycleListener.scopeKey
 
 
 object Helper {
     @JvmStatic
-    inline fun AutoScoped.scopee(): Scope {
+    inline fun AutoScoped.getCachedScope(): Scope {
         return scopeMap[this] ?: when (this) {
             is View -> findParentScopeForView(this)
             is Activity -> activityScopedCache[this]!!
@@ -64,21 +64,7 @@ object Helper {
 
 
 interface AutoScoped : Scoped {
-    override val scope: Scope get() = scopee()
-
+    override val scope: Scope get() = getCachedScope()
 
     fun Intent.nestedScopeExtra() = putExtra(scopeKey, scope)
-
-
-    private fun findParentScopeForFragment(fragment: Fragment): Scope {
-        val parentFragment = fragment.parentFragment
-        if (parentFragment == null) {
-            val activity = fragment.activity
-            if (activity != null && activity is Scoped) return activity.scope
-            throw IllegalArgumentException("Fragment does not have scoped parent $fragment")
-        } else {
-            if (parentFragment is Scoped) return parentFragment.scope
-            return findParentScopeForFragment(parentFragment)
-        }
-    }
 }

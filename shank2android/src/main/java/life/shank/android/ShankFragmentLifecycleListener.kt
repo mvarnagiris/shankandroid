@@ -8,11 +8,12 @@ import java.util.*
 
 object ShankFragmentLifecycleListener : FragmentManager.FragmentLifecycleCallbacks() {
     override fun onFragmentPreCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
-        fragmentScopedCache[f] = savedInstanceState?.getSerializable("scope") as? Scope ?: Scope(UUID.randomUUID())
+        fragmentScopedCache[f] = savedInstanceState?.getSerializable("scope") as? Scope
+            ?: Scope(UUID.randomUUID())
     }
 
     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
-        if (f.activity?.isFinishing == true) {
+        if (f.activity?.isFinishing == true || f.isRemoving) {
             fragmentScopedCache[f]?.clear()
         }
         fragmentScopedCache.remove(f)

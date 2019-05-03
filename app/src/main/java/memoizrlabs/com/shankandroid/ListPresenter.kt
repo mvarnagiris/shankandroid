@@ -11,11 +11,12 @@ class ListPresenter(val data: Int) : PresenterAdapter<ListPresenter.View>() {
     }
 
     override fun onDetach(v: ListPresenter.View) {
-        println("detaching, data; $data")
+        v.doOnDetach()
     }
 
     interface View : PresenterAdapter.View {
         fun setContent(data: Int)
+        fun doOnDetach()
     }
 }
 class OtherListPresenter(val data: Int) : PresenterAdapter<OtherListPresenter.View>() {
