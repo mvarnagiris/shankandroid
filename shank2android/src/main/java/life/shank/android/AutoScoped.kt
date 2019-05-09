@@ -27,7 +27,7 @@ object Helper {
         val parentViewScope = view.findScopeInParentView()
         if (parentViewScope != null) return parentViewScope
 
-        if (view.id == 0) throw IllegalArgumentException("View must have an id $view")
+        if (view.id == View.NO_ID) throw IllegalArgumentException("View must have an id $view")
         val activity = view.context as? AppCompatActivity
             ?: throw IllegalArgumentException("View does not have an AppCompatActivity $view")
         val fragmentManager = activity.supportFragmentManager
