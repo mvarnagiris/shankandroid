@@ -19,5 +19,9 @@ abstract class PresenterAdapter<V>: Presenter<V>(), AttachListener<V> where V: A
         onDetach(v)
     }
 
+    override fun onDispose() {
+        println("disposing")
+    }
+
     interface View : Presenter.View, Attachable
 }

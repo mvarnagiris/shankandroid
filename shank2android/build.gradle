@@ -23,7 +23,6 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -32,12 +31,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {
-    api 'com.github.memoizr.shank:Shank:2.0.5'
-    api 'com.github.memoizr.shank:autoattach-pure:9c95e4d'
+    api 'com.github.memoizr.shank:Shank:00c136f'
+    api 'com.github.memoizr.shank:autoattach-pure:00c136f'
 
     implementation 'androidx.appcompat:appcompat:1.0.2'
 }
