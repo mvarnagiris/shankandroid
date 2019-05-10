@@ -2,7 +2,7 @@
           package="memoizrlabs.com.shank2android">
     <application>
         <provider
-                android:authorities="shank"
+                android:authorities="${applicationId}.shank.content.provider"
                 android:name="life.shank.android.ShankContentProvider"
         />
     </application>

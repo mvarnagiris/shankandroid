@@ -10,7 +10,7 @@ class ShankContentProvider : ContentProvider() {
 
     override fun onCreate(): Boolean {
         (context as Application).registerActivityLifecycleCallbacks(ShankActivityLifecycleListener)
-        AppContextModule.apply { context = this@ShankContentProvider.context!! }
+        AppContextModule.apply { context = this@ShankContentProvider.context!!.applicationContext }
         return true
     }
 
