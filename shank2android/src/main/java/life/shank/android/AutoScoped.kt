@@ -14,7 +14,7 @@ import life.shank.android.ShankActivityLifecycleListener.scopeKey
 
 object Helper {
     @JvmStatic
-    inline fun AutoScoped.getCachedScope(): Scope {
+    internal inline fun AutoScoped.getCachedScope(): Scope {
         return scopeMap[this] ?: when (this) {
             is View -> findParentScopeForView(this)
             is Activity -> activityScopedCache[this]!!
@@ -23,12 +23,12 @@ object Helper {
         }.also { scopeMap[this] = it.addOnClearAction { scopeMap.remove(this) } }
     }
 
-    inline fun findParentScopeForView(view: View): Scope {
+    internal inline fun findParentScopeForView(view: View): Scope {
         val parentViewScope = view.findScopeInParentView()
         if (parentViewScope != null) return parentViewScope
 
         if (view.id == View.NO_ID) throw IllegalArgumentException("View must have an id $view")
-        val activity = view.context as? AppCompatActivity
+        val activity = view.activity as? AppCompatActivity
             ?: throw IllegalArgumentException("View does not have an AppCompatActivity $view")
         val fragmentManager = activity.supportFragmentManager
 
@@ -40,7 +40,7 @@ object Helper {
         throw IllegalArgumentException("View does not have any parent scopes $view")
     }
 
-    fun FragmentManager.findScopeInFragmentClosestToTheView(view: View): Scope? {
+    internal fun FragmentManager.findScopeInFragmentClosestToTheView(view: View): Scope? {
         val scopedFragment = fragments.firstOrNull {
             val scopedChildFragment = it.childFragmentManager.findScopeInFragmentClosestToTheView(view)
             if (scopedChildFragment != null) return scopedChildFragment
@@ -50,7 +50,7 @@ object Helper {
         return scopedFragment?.scope
     }
 
-    fun View.findScopeInParentView(): Scope? {
+    internal fun View.findScopeInParentView(): Scope? {
         val parentView = parent as? View
         if (parentView != null) {
             if (parentView is Scoped) return parentView.scope
@@ -59,7 +59,7 @@ object Helper {
         return null
     }
 
-    inline private fun Fragment.containsView(view: View) = view == this.view?.findViewById(view.id)
+    private inline fun Fragment.containsView(view: View) = view == this.view?.findViewById(view.id)
 }
 
 
