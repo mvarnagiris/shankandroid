@@ -4,36 +4,29 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.LifecycleOwner
 import life.shank.Scope
 import java.util.UUID
 
+@Suppress("NOTHING_TO_INLINE")
 internal object ScopeHelper {
-    internal inline fun AutoScoped.doScopedInternal(noinline osr: (Scope) -> Unit) {
-        when (this) {
-            is LifecycleOwner -> ScopeObservable.getScope(this.hashCode(), osr)
-            is View -> findScopeForView(this, osr)
-            else -> throw IllegalArgumentException()
-        }
-    }
 
-    private fun findScopeForView(view: View, osr: (Scope) -> Unit) {
+    fun newScope() = Scope(UUID.randomUUID())
+
+    fun findScopeForView(view: View, onScopeReady: (Scope) -> Unit) {
         if (view.isAttachedToWindow) {
-            findParentScopeForView(view).doScoped(osr)
+            findParentScopeForView(view).onScopeReady(onScopeReady)
         } else {
             view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
                 override fun onViewDetachedFromWindow(v: View?) {}
                 override fun onViewAttachedToWindow(v: View?) {
-                    findParentScopeForView(view).doScoped(osr)
+                    findParentScopeForView(view).onScopeReady(onScopeReady)
                     view.removeOnAttachStateChangeListener(this)
                 }
             })
         }
     }
 
-    fun newScope() = Scope(UUID.randomUUID())
-
-    fun findParentScopeForView(view: View): AutoScoped {
+    private fun findParentScopeForView(view: View): AutoScoped {
 
         val parentViewScope = view.findScopeInParentView()
         if (parentViewScope != null) return parentViewScope
@@ -51,17 +44,16 @@ internal object ScopeHelper {
         throw IllegalArgumentException("View does not have any parent scopes $view")
     }
 
-    fun FragmentManager.findScopeInFragmentClosestToTheView(view: View): AutoScoped? {
-        val scopedFragment = fragments.firstOrNull {
+    private fun FragmentManager.findScopeInFragmentClosestToTheView(view: View): AutoScoped? {
+        return fragments.firstOrNull {
             val scopedChildFragment = it.childFragmentManager.findScopeInFragmentClosestToTheView(view)
             if (scopedChildFragment != null) return scopedChildFragment
 
             it.containsView(view) && it is AutoScoped
         } as? AutoScoped
-        return scopedFragment
     }
 
-    fun View.findScopeInParentView(): AutoScoped? {
+    private fun View.findScopeInParentView(): AutoScoped? {
         val parentView = parent as? View
         if (parentView != null) {
             return if (parentView is AutoScoped) parentView else parentView.findScopeInParentView()
@@ -69,6 +61,5 @@ internal object ScopeHelper {
         return null
     }
 
-    inline private fun Fragment.containsView(view: View) = view == this.view?.findViewById(view.id)
+    private inline fun Fragment.containsView(view: View) = view == this.view?.findViewById(view.id)
 }
-
