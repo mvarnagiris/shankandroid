@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import life.shank.Scope
 import life.shank.android.ScopeHelper.newScope
-import java.util.UUID
 
 object AutoScopedFragmentLifecycleCallbacks : FragmentManager.FragmentLifecycleCallbacks() {
 
@@ -14,8 +13,8 @@ object AutoScopedFragmentLifecycleCallbacks : FragmentManager.FragmentLifecycleC
     override fun onFragmentPreCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
         if (f !is AutoScoped) return
 
-        ScopeObservable.putScope(
-            f.hashCode(),
+        ObservableLifecycleOwnerScope.putScope(
+            f,
             savedInstanceState?.getSerializable(fragmentScopeKey) as? Scope ?: newScope()
         )
     }
@@ -24,17 +23,17 @@ object AutoScopedFragmentLifecycleCallbacks : FragmentManager.FragmentLifecycleC
         if (f !is AutoScoped) return
 
         if (f.activity?.isFinishing == true || f.isRemoving) {
-            ScopeObservable.getScope(f.hashCode()) {
+            ObservableLifecycleOwnerScope.doOnScopeReady(f) {
                 it.clear()
             }
         }
-        ScopeObservable.clear(f.hashCode())
+        ObservableLifecycleOwnerScope.clear(f)
     }
 
     override fun onFragmentSaveInstanceState(fm: FragmentManager, f: Fragment, outState: Bundle) {
         if (f !is AutoScoped) return
 
-        ScopeObservable.getScope(f.hashCode()) {
+        ObservableLifecycleOwnerScope.doOnScopeReady(f) {
             outState.putSerializable(fragmentScopeKey, it)
         }
     }

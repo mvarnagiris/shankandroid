@@ -39,4 +39,7 @@ dependencies {
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1'
 
     implementation 'androidx.appcompat:appcompat:1.0.2'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'com.github.memoizr:assertk-core:1.1.0'
 }

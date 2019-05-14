@@ -13,7 +13,7 @@ interface AutoScoped {
 
     fun onScopeReady(block: (Scope) -> Unit) {
         when (this) {
-            is LifecycleOwner -> ScopeObservable.getScope(hashCode(), block)
+            is LifecycleOwner -> ObservableLifecycleOwnerScope.doOnScopeReady(this, block)
             is View -> ScopeHelper.findScopeForView(this, block)
             else -> throw IllegalArgumentException()
         }

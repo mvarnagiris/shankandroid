@@ -21,7 +21,7 @@ class ListItemView @JvmOverloads constructor(context: Context, attrs: AttributeS
     fun initialize(data: Int) {
         listPresenter.register(this, data)
 
-        doScoped {
+        onScopeReady {
             println("scope ${it.value}")
         }
     }
