@@ -6,15 +6,29 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import life.shank.*
-import life.shank.android.Helper.xxx
+import life.shank.android.Helper.doScopedInternal
 
 
 object Helper {
-    inline fun AutoScoped.xxx(noinline osr: (Scope) -> Unit) {
+    internal inline fun AutoScoped.doScopedInternal(noinline osr: (Scope) -> Unit) {
         when (this) {
             is LifecycleOwner -> ScopeObservable.getScope(this.hashCode(), osr)
-            is View -> findParentScopeForView(this).doScoped(osr)
+            is View -> findScopeForView(this, osr)
             else -> throw IllegalArgumentException()
+        }
+    }
+
+    private fun findScopeForView(view: View, osr: (Scope) -> Unit) {
+        if (view.isAttachedToWindow) {
+            findParentScopeForView(view).doScoped(osr)
+        } else {
+            view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+                override fun onViewDetachedFromWindow(v: View?) {}
+                override fun onViewAttachedToWindow(v: View?) {
+                    findParentScopeForView(view).doScoped(osr)
+                    view.removeOnAttachStateChangeListener(this)
+                }
+            })
         }
     }
 
@@ -59,10 +73,15 @@ object Helper {
 
 
 interface AutoScoped {
-    fun doScoped(onScopeReady: (Scope) -> Unit) = xxx(onScopeReady)
+    fun doScoped(onScopeReady: (Scope) -> Unit) = doScopedInternal(onScopeReady)
 
     operator fun <T> ScopedProvider0<T>.invoke(o: (T) -> Unit = {}) = doScoped { invoke(it).also { o(it) } }
-    operator fun <A, T> ScopedProvider1<A, T>.invoke(a: A, o: (T) -> Unit = {}) = doScoped { invoke(it, a).also { o(it) } }
-    operator fun <A, B, T> ScopedProvider2<A, B, T>.invoke(a: A, b: B, o: (T) -> Unit = {}) = doScoped { invoke(it, a, b).also { o(it) } }
-    operator fun <A, B, C, T> ScopedProvider3<A, B, C, T>.invoke(a: A, b: B, c: C, o: (T) -> Unit = {}) = doScoped { invoke(it, a, b, c).also { o(it) } }
+    operator fun <A, T> ScopedProvider1<A, T>.invoke(a: A, o: (T) -> Unit = {}) =
+        doScoped { invoke(it, a).also { o(it) } }
+
+    operator fun <A, B, T> ScopedProvider2<A, B, T>.invoke(a: A, b: B, o: (T) -> Unit = {}) =
+        doScoped { invoke(it, a, b).also { o(it) } }
+
+    operator fun <A, B, C, T> ScopedProvider3<A, B, C, T>.invoke(a: A, b: B, c: C, o: (T) -> Unit = {}) =
+        doScoped { invoke(it, a, b, c).also { o(it) } }
 }

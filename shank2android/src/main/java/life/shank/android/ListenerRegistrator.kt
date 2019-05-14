@@ -33,9 +33,12 @@ abstract class ListenerRegistrator<V : Attachable, T : AttachListener<V>> {
     }
 
     protected inline fun T.registerAutoDetacheable(v: V): T = also { attachListener ->
-        (v as Scoped)
+        (v as AutoScoped)
         when (v) {
             is View -> {
+                if (v.isAttachedToWindow) {
+                    attachListener.onAttach(v)
+                }
                 listeners[v]
                     ?.let { it as ViewCachedListener<V, T> }
                     ?.apply {
@@ -44,7 +47,9 @@ abstract class ListenerRegistrator<V : Attachable, T : AttachListener<V>> {
                     ?: ViewCachedListener(attachListener).also {
                         listeners[v] = it
                         v.addOnAttachStateChangeListener(it)
-                        v.scope.addOnClearAction(action)
+                        v.doScoped {
+                            it.addOnClearAction(action)
+                        }
                     }
             }
             is LifecycleOwner -> {
@@ -58,7 +63,9 @@ abstract class ListenerRegistrator<V : Attachable, T : AttachListener<V>> {
                         .also {
                             listeners[v] = it
                             v.lifecycle.addObserver(it)
-                            v.scope.addOnClearAction(action)
+                            v.doScoped {
+                                it.addOnClearAction(action)
+                            }
                         }
             }
         }

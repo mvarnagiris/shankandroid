@@ -4,14 +4,13 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import life.shank.Scope
-import java.util.*
 
 object ShankFragmentLifecycleListener : FragmentManager.FragmentLifecycleCallbacks() {
     private val fragmentScopeKey = "shank_fragment_scope_key"
     override fun onFragmentPreCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
         println("creating fragmeeent")
         ScopeObservable.putScope(f.hashCode(), savedInstanceState?.getSerializable(fragmentScopeKey) as? Scope
-            ?: Scope(UUID.randomUUID()))
+            ?: Scope(f.toString()))
     }
 
     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {

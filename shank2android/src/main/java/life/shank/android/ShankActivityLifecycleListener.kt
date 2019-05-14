@@ -5,12 +5,6 @@ import android.app.Application
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import life.shank.Scope
-import java.util.*
-
-//private val activityScopedCache = IdentityHashMap<Activity, Scope>()
-//val fragmentScopedCache = IdentityHashMap<Fragment, Scope>()
-@JvmField
-val scopeMap = IdentityHashMap<Any, Scope>()
 
 object ShankActivityLifecycleListener : Application.ActivityLifecycleCallbacks {
     internal val scopeKey = "shank_scope_key"
@@ -18,9 +12,8 @@ object ShankActivityLifecycleListener : Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         val scope = (savedInstanceState?.getSerializable(scopeKey) as? Scope
             ?: activity.intent.getSerializableExtra(scopeKey) as? Scope
-            ?: Scope(UUID.randomUUID()))
+            ?: Scope(activity.toString()))
 
-//        activityScopedCallbackCache[activity]?.invoke(scope)
         ScopeObservable.putScope(activity.hashCode(), scope)
 
         (activity as FragmentActivity)
