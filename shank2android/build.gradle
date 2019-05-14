@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    String shank_version = 'b09c024'
+    String shank_version = '671fd9c'
     api "com.github.memoizr.shank:Shank:$shank_version"
     api "com.github.memoizr.shank:autoattach-pure:$shank_version"
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1'
