@@ -21,6 +21,7 @@ class CustomFragment : Fragment(), AutoScoped, AutoAttachable, ListPresenter.Vie
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         listPresenter.register(this, 99)
     }
 

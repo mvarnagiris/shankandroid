@@ -13,8 +13,10 @@ object AutoScopedFragmentLifecycleCallbacks : FragmentManager.FragmentLifecycleC
     override fun onFragmentPreCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
         if (f !is AutoScoped) return
 
+
         ObservableLifecycleOwnerScope.putScope(
             f,
+            f.arguments?.keySet()?.find { f.arguments?.getSerializable(it) is Scope }?.let { (it as Scope).nest() } ?:
             savedInstanceState?.getSerializable(fragmentScopeKey) as? Scope ?: Scope(UUID.randomUUID())
         )
     }
