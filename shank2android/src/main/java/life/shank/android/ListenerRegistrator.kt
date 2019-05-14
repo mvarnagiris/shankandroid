@@ -72,17 +72,17 @@ class NewAutoAttachListenerProvider0<V : Attachable, T : AttachListener<V>>(prov
 
 class NewAutoAttachListenerProvider1<A, V : Attachable, T : AttachListener<V>>(provider: NewProvider1<A, T>) :
     ListenerRegistrator<V, T>(), NewProvider1<A, T> by provider {
-    inline fun bind(v: V, a: A) = invoke(a).registerAutoDetacheable(v)
+    inline fun register(v: V, a: A) = invoke(a).registerAutoDetacheable(v)
 }
 
 class NewAutoAttachListenerProvider2<A, B, V : Attachable, T : AttachListener<V>>(provider: NewProvider2<A, B, T>) :
     ListenerRegistrator<V, T>(), NewProvider2<A, B, T> by provider {
-    inline fun bind(v: V, a: A, b: B) = invoke(a, b).registerAutoDetacheable(v)
+    inline fun register(v: V, a: A, b: B) = invoke(a, b).registerAutoDetacheable(v)
 }
 
 class NewAutoAttachListenerProvider3<A, B, C, V : Attachable, T : AttachListener<V>>(provider: NewProvider3<A, B, C, T>) :
     ListenerRegistrator<V, T>(), NewProvider3<A, B, C, T> by provider {
-    inline fun bind(v: V, a: A, b: B, c: C) = invoke(a, b, c).registerAutoDetacheable(v)
+    inline fun register(v: V, a: A, b: B, c: C) = invoke(a, b, c).registerAutoDetacheable(v)
 }
 
 class NewAutoAttachListenerProvider4<A, B, C, D, V : Attachable, T : AttachListener<V>>(provider: NewProvider4<A, B, C, D, T>) :
