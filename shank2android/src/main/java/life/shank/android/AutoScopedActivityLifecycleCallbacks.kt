@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import life.shank.Scope
-import life.shank.android.ScopeHelper.newScope
+import java.util.UUID
 
 
 object AutoScopedActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
@@ -17,7 +17,7 @@ object AutoScopedActivityLifecycleCallbacks : Application.ActivityLifecycleCallb
         if (activity is AutoScoped && activity is LifecycleOwner) {
             ObservableLifecycleOwnerScope.putScope(
                 activity,
-                savedInstanceState?.getSerializable(activityScopeKey) as? Scope ?: newScope()
+                savedInstanceState?.getSerializable(activityScopeKey) as? Scope ?: Scope(UUID.randomUUID())
             )
         }
 

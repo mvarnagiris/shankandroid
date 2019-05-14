@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import life.shank.Scope
-import life.shank.android.ScopeHelper.newScope
+import java.util.UUID
 
 object AutoScopedFragmentLifecycleCallbacks : FragmentManager.FragmentLifecycleCallbacks() {
 
@@ -15,7 +15,7 @@ object AutoScopedFragmentLifecycleCallbacks : FragmentManager.FragmentLifecycleC
 
         ObservableLifecycleOwnerScope.putScope(
             f,
-            savedInstanceState?.getSerializable(fragmentScopeKey) as? Scope ?: newScope()
+            savedInstanceState?.getSerializable(fragmentScopeKey) as? Scope ?: Scope(UUID.randomUUID())
         )
     }
 
