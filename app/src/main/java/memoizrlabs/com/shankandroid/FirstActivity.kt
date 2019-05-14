@@ -17,10 +17,12 @@ class FirstActivity : AppCompatActivity(), AutoScoped {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        println("$this ${foo().yo}")
+        foo() {
+            println("$this ${it.yo}")
+        }
 
         launchself.setOnClickListener {
-            startActivity(Intent(this, SecondActivity::class.java).nestedScopeExtra())
+            startActivity(Intent(this, SecondActivity::class.java))
         }
     }
 
@@ -36,7 +38,9 @@ class SecondActivity : AppCompatActivity(), AutoScoped {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        println("$this getting presenter instance: ${foo().yo}")
+        foo {
+            println("$this getting presenter instance: ${it.yo}")
+        }
 
         launchself.setOnClickListener {
             startActivity(Intent(this, FirstActivity::class.java))

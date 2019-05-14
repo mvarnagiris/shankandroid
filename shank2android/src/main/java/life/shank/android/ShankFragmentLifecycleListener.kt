@@ -9,17 +9,22 @@ import java.util.*
 object ShankFragmentLifecycleListener : FragmentManager.FragmentLifecycleCallbacks() {
     private val fragmentScopeKey = "shank_fragment_scope_key"
     override fun onFragmentPreCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
-        fragmentScopedCache[f] = savedInstanceState?.getSerializable(fragmentScopeKey) as? Scope
-            ?: Scope(UUID.randomUUID())
+        println("creating fragmeeent")
+        ScopeObservable.putScope(f.hashCode(), savedInstanceState?.getSerializable(fragmentScopeKey) as? Scope
+            ?: Scope(UUID.randomUUID()))
     }
 
     override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
         if (f.activity?.isFinishing == true || f.isRemoving) {
-            fragmentScopedCache[f]?.clear()
+            ScopeObservable.getScope(f.hashCode()) {
+                it.clear()
+            }
         }
-        fragmentScopedCache.remove(f)
+        ScopeObservable.clear(f.hashCode())
     }
 
     override fun onFragmentSaveInstanceState(fm: FragmentManager, f: Fragment, outState: Bundle): Unit =
-        outState.putSerializable(fragmentScopeKey, fragmentScopedCache[f])
+        ScopeObservable.getScope(f.hashCode()) {
+            outState.putSerializable(fragmentScopeKey, it)
+        }
 }
