@@ -47,7 +47,7 @@ abstract class ListenerRegistrator<V : Attachable, T : AttachListener<V>> {
                     ?: ViewCachedListener(attachListener).also {
                         listeners[v] = it
                         v.addOnAttachStateChangeListener(it)
-                        v.doScoped {
+                        v.onScopeReady {
                             it.addOnClearAction(action)
                         }
                     }
@@ -63,7 +63,7 @@ abstract class ListenerRegistrator<V : Attachable, T : AttachListener<V>> {
                         .also {
                             listeners[v] = it
                             v.lifecycle.addObserver(it)
-                            v.doScoped {
+                            v.onScopeReady {
                                 it.addOnClearAction(action)
                             }
                         }

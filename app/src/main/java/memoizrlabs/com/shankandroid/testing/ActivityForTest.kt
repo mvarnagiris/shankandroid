@@ -1,6 +1,7 @@
 package memoizrlabs.com.shankandroid.testing
 
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,7 +18,7 @@ import memoizrlabs.com.shankandroid.PresenterAdapter
 import memoizrlabs.com.shankandroid.testing.TestModule.scopedResourceForActivity
 import memoizrlabs.com.shankandroid.testing.TestModule.scopedResourceForFragment
 import memoizrlabs.com.shankandroid.testing.TestModule.scopedResourceForViewInActivity
-import java.util.*
+import java.util.UUID
 
 class ActivityForTest : AppCompatActivity(), AutoScoped {
 
@@ -44,6 +45,7 @@ class ActivityForTest : AppCompatActivity(), AutoScoped {
     }
 }
 
+@SuppressLint("ResourceType")
 class ViewForTest(context: Context) : FrameLayout(context), AutoScoped {
     lateinit var value: UUID
 
@@ -78,5 +80,5 @@ class FragmentForTest : Fragment(), AutoScoped {
 
 
 class PresenterForTest : PresenterAdapter<PresenterForTest.View>() {
-    interface View: PresenterAdapter.View
+    interface View : PresenterAdapter.View
 }

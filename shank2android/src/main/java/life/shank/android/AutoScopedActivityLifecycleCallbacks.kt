@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LifecycleOwner
 import life.shank.Scope
 import life.shank.android.ScopeHelper.newScope
 
@@ -13,9 +14,9 @@ object AutoScopedActivityLifecycleCallbacks : Application.ActivityLifecycleCallb
     private const val activityScopeKey = "shank_activity_scope_key"
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        if (activity is AutoScoped) {
-            ScopeObservable.putScope(
-                activity.hashCode(),
+        if (activity is AutoScoped && activity is LifecycleOwner) {
+            ObservableLifecycleOwnerScope.putScope(
+                activity,
                 savedInstanceState?.getSerializable(activityScopeKey) as? Scope ?: newScope()
             )
         }
@@ -26,20 +27,20 @@ object AutoScopedActivityLifecycleCallbacks : Application.ActivityLifecycleCallb
     }
 
     override fun onActivityDestroyed(activity: Activity) {
-        if (activity !is AutoScoped) return
+        if (activity !is AutoScoped || activity !is LifecycleOwner) return
 
         if (activity.isFinishing) {
-            ScopeObservable.getScope(activity.hashCode()) {
+            ObservableLifecycleOwnerScope.doOnScopeReady(activity) {
                 it.clear()
             }
         }
-        ScopeObservable.clear(activity.hashCode())
+        ObservableLifecycleOwnerScope.clear(activity)
     }
 
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-        if (activity !is AutoScoped) return
+        if (activity !is AutoScoped || activity !is LifecycleOwner) return
 
-        ScopeObservable.getScope(activity.hashCode()) {
+        ObservableLifecycleOwnerScope.doOnScopeReady(activity) {
             outState.putSerializable(activityScopeKey, it)
         }
     }

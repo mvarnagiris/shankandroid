@@ -22,9 +22,7 @@ class ActivityScopeTest {
         activityRule.launchActivity(Intent())
 
         val v1 = get<ActivityForTest>().value
-
         currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-
         val v2 = get<ActivityForTest>().value
 
         expect that v1 isEqualTo v2
@@ -35,9 +33,7 @@ class ActivityScopeTest {
         activityRule.launchActivity(Intent())
 
         val v1 = get<ActivityForTest>().view.value
-
         currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-
         val v2 = get<ActivityForTest>().view.value
 
         expect that v1 isEqualTo v2
@@ -48,9 +44,7 @@ class ActivityScopeTest {
         activityRule.launchActivity(Intent())
 
         val v1 = get<ActivityForTest>().fragment.value
-
         currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-
         val v2 = get<ActivityForTest>().fragment.value
 
         expect that v1 isEqualTo v2
@@ -61,9 +55,7 @@ class ActivityScopeTest {
         activityRule.launchActivity(Intent())
 
         val v1 = (get<ActivityForTest>().fragment.view as ViewForTest).value
-
         currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-
         val v2 = (get<ActivityForTest>().fragment.view as ViewForTest).value
 
         expect that v1 isEqualTo v2
