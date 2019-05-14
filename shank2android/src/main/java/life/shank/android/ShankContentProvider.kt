@@ -9,7 +9,7 @@ import android.net.Uri
 class ShankContentProvider : ContentProvider() {
 
     override fun onCreate(): Boolean {
-        (context as Application).registerActivityLifecycleCallbacks(ShankActivityLifecycleListener)
+        (context as Application).registerActivityLifecycleCallbacks(AutoScopedActivityLifecycleCallbacks)
         AppContextModule.apply { context = this@ShankContentProvider.context!!.applicationContext }
         return true
     }
