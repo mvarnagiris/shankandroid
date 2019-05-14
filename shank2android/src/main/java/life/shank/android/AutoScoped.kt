@@ -3,6 +3,7 @@ package life.shank.android
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import life.shank.Scope
+import life.shank.Scoped
 import life.shank.ScopedProvider0
 import life.shank.ScopedProvider1
 import life.shank.ScopedProvider2
@@ -13,6 +14,7 @@ interface AutoScoped {
 
     fun onScopeReady(block: (Scope) -> Unit) {
         when (this) {
+            is Scoped -> block(scope)
             is LifecycleOwner -> ObservableLifecycleOwnerScope.doOnScopeReady(this, block)
             is View -> doOnScopeReady(block)
             else -> throw IllegalArgumentException()
