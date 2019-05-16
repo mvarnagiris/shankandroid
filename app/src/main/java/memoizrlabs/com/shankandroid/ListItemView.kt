@@ -2,7 +2,6 @@ package memoizrlabs.com.shankandroid
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.list_item.view.*
 import life.shank.android.AutoAttachable
@@ -13,7 +12,7 @@ class ListItemView @JvmOverloads constructor(context: Context, attrs: AttributeS
     LinearLayout(context, attrs, style), ListPresenter.View, AutoAttachable, AutoScoped  {
 
     init {
-        id = View.generateViewId()
+//        id = View.generateViewId()
     }
 
     var lastContent: Int? = null
