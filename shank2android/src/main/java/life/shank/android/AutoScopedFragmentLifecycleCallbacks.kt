@@ -16,7 +16,6 @@ object AutoScopedFragmentLifecycleCallbacks : FragmentManager.FragmentLifecycleC
 
         ObservableLifecycleOwnerScope.putScope(
             f,
-            f.arguments?.keySet()?.find { f.arguments?.getSerializable(it) is Scope }?.let { (it as Scope).nest() } ?:
             savedInstanceState?.getSerializable(fragmentScopeKey) as? Scope ?: Scope(UUID.randomUUID())
         )
     }
