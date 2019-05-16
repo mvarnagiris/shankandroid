@@ -30,15 +30,16 @@ abstract class ListenerRegistrator<V : Attachable, T : AttachListener<V>> {
     }
 
     class ReusableViewCachedListener<V : Attachable, T : AttachListener<V>>(override var attachListener: T) :
-        ViewCachedListener<V,T> {
+        ViewCachedListener<V, T> {
         override fun onViewAttachedToWindow(v: View?): Unit = attachListener.onAttach(v as V)
         override fun onViewDetachedFromWindow(v: View?): Unit = attachListener.onDetach(v as V)
     }
 
     class SingleUseViewCachedListener<V : Attachable, T : AttachListener<V>>(override var attachListener: T) :
-        ViewCachedListener<V,T> {
+        ViewCachedListener<V, T> {
         override fun onViewAttachedToWindow(v: View?): Unit = attachListener.onAttach(v as V)
-        override fun onViewDetachedFromWindow(v: View?): Unit = attachListener.onDetach(v as V).also { v.removeOnAttachStateChangeListener(this) }
+        override fun onViewDetachedFromWindow(v: View?): Unit =
+            attachListener.onDetach(v as V).also { v.removeOnAttachStateChangeListener(this) }
     }
 
     class LifecycleCachedListener<V : Attachable, T : AttachListener<V>>(var attachListener: T, var v: V) :
@@ -55,7 +56,20 @@ abstract class ListenerRegistrator<V : Attachable, T : AttachListener<V>> {
         }
     }
 
-    protected inline fun T.registerAutoDetacheable(v: V, needsScope: Boolean): T = also { attachListener ->
+    protected inline fun T.registerSingleUseAutoDetacheable(v: V): T = also { attachListener ->
+        when (v) {
+            is View -> {
+                if (v.isAttachedToWindow) {
+                    attachListener.onAttach(v)
+                }
+                SingleUseViewCachedListener(attachListener).also { v.addOnAttachStateChangeListener(it) }
+            }
+            is LifecycleOwner -> LifecycleCachedListener(attachListener, v).also { v.lifecycle.addObserver(it) }
+
+        }
+    }
+
+    protected inline fun T.registerCachedAutoDetacheable(v: V): T = also { attachListener ->
         (v as AutoScoped)
         when (v) {
             is View -> {
@@ -67,15 +81,13 @@ abstract class ListenerRegistrator<V : Attachable, T : AttachListener<V>> {
                     ?.apply {
                         this.attachListener = attachListener
                     }
-                    ?: (if (needsScope) ReusableViewCachedListener(attachListener).also {
+                    ?: ReusableViewCachedListener(attachListener).also {
+                        listeners[v] = it
+                        v.addOnAttachStateChangeListener(it)
                         v.onScopeReady {
                             it.addOnClearAction(action)
                         }
-                    } else SingleUseViewCachedListener(attachListener))
-                        .also {
-                            listeners[v] = it
-                            v.addOnAttachStateChangeListener(it)
-                        }
+                    }
             }
             is LifecycleOwner -> {
                 listeners[v]
@@ -99,50 +111,50 @@ abstract class ListenerRegistrator<V : Attachable, T : AttachListener<V>> {
 
 class NewAutoAttachListenerProvider0<V : Attachable, T : AttachListener<V>>(provider: NewProvider0<T>) :
     ListenerRegistrator<V, T>(), NewProvider0<T> by provider {
-    fun register(v: V) = invoke().registerAutoDetacheable(v,false)
+    fun register(v: V) = invoke().registerSingleUseAutoDetacheable(v)
 }
 
 class NewAutoAttachListenerProvider1<A, V : Attachable, T : AttachListener<V>>(provider: NewProvider1<A, T>) :
     ListenerRegistrator<V, T>(), NewProvider1<A, T> by provider {
-    fun register(v: V, a: A) = invoke(a).registerAutoDetacheable(v, false)
+    fun register(v: V, a: A) = invoke(a).registerSingleUseAutoDetacheable(v)
 }
 
 class NewAutoAttachListenerProvider2<A, B, V : Attachable, T : AttachListener<V>>(provider: NewProvider2<A, B, T>) :
     ListenerRegistrator<V, T>(), NewProvider2<A, B, T> by provider {
-    fun register(v: V, a: A, b: B) = invoke(a, b).registerAutoDetacheable(v, false)
+    fun register(v: V, a: A, b: B) = invoke(a, b).registerSingleUseAutoDetacheable(v)
 }
 
 class NewAutoAttachListenerProvider3<A, B, C, V : Attachable, T : AttachListener<V>>(provider: NewProvider3<A, B, C, T>) :
     ListenerRegistrator<V, T>(), NewProvider3<A, B, C, T> by provider {
-    fun register(v: V, a: A, b: B, c: C) = invoke(a, b, c).registerAutoDetacheable(v, false)
+    fun register(v: V, a: A, b: B, c: C) = invoke(a, b, c).registerSingleUseAutoDetacheable(v)
 }
 
 class NewAutoAttachListenerProvider4<A, B, C, D, V : Attachable, T : AttachListener<V>>(provider: NewProvider4<A, B, C, D, T>) :
     ListenerRegistrator<V, T>(), NewProvider4<A, B, C, D, T> by provider {
-    fun register(v: V, a: A, b: B, c: C, d: D) = invoke(a, b, c, d).registerAutoDetacheable(v, false)
+    fun register(v: V, a: A, b: B, c: C, d: D) = invoke(a, b, c, d).registerSingleUseAutoDetacheable(v)
 }
 
 class NewAutoAttachListenerProvider5<A, B, C, D, E, V : Attachable, T : AttachListener<V>>(provider: NewProvider5<A, B, C, D, E, T>) :
     ListenerRegistrator<V, T>(), NewProvider5<A, B, C, D, E, T> by provider {
-    fun register(v: V, a: A, b: B, c: C, d: D, e: E) = invoke(a, b, c, d, e).registerAutoDetacheable(v, false)
+    fun register(v: V, a: A, b: B, c: C, d: D, e: E) = invoke(a, b, c, d, e).registerSingleUseAutoDetacheable(v)
 }
 
 class ScopedAutoAttachListenerProvider0<V : Attachable, T : AttachListener<V>>(provider: ScopedProvider0<T>) :
     ListenerRegistrator<V, T>(), ScopedProvider0<T> by provider {
-    fun register(scope: Scope, v: V) = invoke(scope).registerAutoDetacheable(v, true)
+    fun register(scope: Scope, v: V) = invoke(scope).registerCachedAutoDetacheable(v)
 }
 
 class ScopedAutoAttachListenerProvider1<A, V : Attachable, T : AttachListener<V>>(provider: ScopedProvider1<A, T>) :
     ListenerRegistrator<V, T>(), ScopedProvider1<A, T> by provider {
-    fun register(scope: Scope, v: V, a: A) = invoke(scope, a).registerAutoDetacheable(v, true)
+    fun register(scope: Scope, v: V, a: A) = invoke(scope, a).registerCachedAutoDetacheable(v)
 }
 
 class ScopedAutoAttachListenerProvider2<A, B, V : Attachable, T : AttachListener<V>>(provider: ScopedProvider2<A, B, T>) :
     ListenerRegistrator<V, T>(), ScopedProvider2<A, B, T> by provider {
-    fun register(scope: Scope, v: V, a: A, b: B) = invoke(scope, a, b).registerAutoDetacheable(v, true)
+    fun register(scope: Scope, v: V, a: A, b: B) = invoke(scope, a, b).registerCachedAutoDetacheable(v)
 }
 
 class ScopedAutoAttachListenerProvider3<A, B, C, V : Attachable, T : AttachListener<V>>(provider: ScopedProvider3<A, B, C, T>) :
     ListenerRegistrator<V, T>(), ScopedProvider3<A, B, C, T> by provider {
-    fun register(scope: Scope, v: V, a: A, b: B, c: C) = invoke(scope, a, b, c).registerAutoDetacheable(v, true)
+    fun register(scope: Scope, v: V, a: A, b: B, c: C) = invoke(scope, a, b, c).registerCachedAutoDetacheable(v)
 }
